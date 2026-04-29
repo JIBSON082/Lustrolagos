@@ -1,173 +1,123 @@
-
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-cormorant: "Cormorant Garamond", serif;
-  --font-dm-sans: "DM Sans", sans-serif;
-  --brown: #a0522d;
-  --brown-light: #c17b3f;
-  --cream: #faf7f2;
-  --cream-dark: #ede8e0;
-  --charcoal: #1a1a1a;
-  --gold: #c9a96e;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: auto; /* Lenis handles this */
-  overflow-x: hidden;
-}
-
-body {
-  background-color: var(--cream);
-  color: var(--charcoal);
-  font-family: var(--font-dm-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-::selection {
-  background: var(--brown-light);
-  color: white;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--cream);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--brown);
-  border-radius: 2px;
-}
-
-/* Glass effect */
+/* =========================================
+   GLASSMORPHIC CARDS
+   ========================================= */
 .glass {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(26, 26, 26, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   isolation: isolate;
   will-change: backdrop-filter;
-  transform: translateZ(0);
 }
 
-@supports (backdrop-filter: blur(12px)) {
-  .glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-}
-@supports not (backdrop-filter: blur(12px)) {
+@supports not ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
   .glass {
     background: rgba(26, 26, 26, 0.85);
   }
 }
 
-/* Glass light variant */
 .glass-light {
   background: rgba(250, 247, 242, 0.85);
-  border: 1px solid rgba(160, 82, 45, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(26, 26, 26, 0.1);
   isolation: isolate;
+  will-change: backdrop-filter;
 }
 
-@supports (backdrop-filter: blur(12px)) {
+@supports not ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
   .glass-light {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(250, 247, 242, 0.95);
   }
 }
 
-/* Hero slideshow */
+/* =========================================
+   HERO SLIDESHOW
+   ========================================= */
 .hero-slide {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transform: scale(1.08);
-  transition: none;
-  will-change: opacity, transform;
+  will-change: transform, opacity;
+  transition: opacity 1500ms ease-in-out, transform 7000ms ease-out;
+}
+
+.hero-scrim {
   pointer-events: none;
 }
 
-.hero-slide.active {
-  opacity: 1;
-  transform: scale(1);
+/* =========================================
+   PULSE DOT ANIMATION
+   ========================================= */
+.pulse-dot {
+  animation: pulse 2s infinite;
 }
 
-/* Scrim overlay */
-.hero-scrim {
-  background: linear-gradient(
-    to bottom,
-    rgba(26, 26, 26, 0.3) 0%,
-    rgba(26, 26, 26, 0.5) 40%,
-    rgba(26, 26, 26, 0.7) 100%
-  );
-}
-
-/* Pulsing dot */
-@keyframes pulse-dot {
-  0%,
-  100% {
+@keyframes pulse {
+  0%, 100% {
     opacity: 1;
     transform: scale(1);
   }
   50% {
     opacity: 0.5;
-    transform: scale(0.8);
+    transform: scale(1.3);
   }
 }
 
-.pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
+/* =========================================
+   STATUS BADGE
+   ========================================= */
+.status-badge {
+  white-space: nowrap;
 }
 
-/* Counter animation */
-.counter-num {
-  font-variant-numeric: tabular-nums;
+/* =========================================
+   MILESTONE CARD
+   ========================================= */
+.milestone-card {
+  position: relative;
 }
 
-/* Reveal initial states */
-.reveal-up {
-  opacity: 0;
-  transform: translateY(50px);
+/* =========================================
+   CARD LIFT HOVER
+   ========================================= */
+.card-lift {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.4s ease;
 }
 
-.reveal-left {
-  opacity: 0;
-  transform: translateX(-50px);
+.card-lift:hover {
+  transform: translateY(-8px);
 }
 
-.reveal-right {
-  opacity: 0;
-  transform: translateX(50px);
+/* =========================================
+   IMAGE ZOOM CONTAINER
+   ========================================= */
+.img-zoom {
+  overflow: hidden;
 }
 
-.reveal-fade {
-  opacity: 0;
+.img-zoom img {
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Horizontal scroll */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* =========================================
+   NAV LINK UNDERLINE
+   ========================================= */
+.nav-link {
+  position: relative;
 }
 
-/* Nav link hover */
 .nav-link::after {
   content: "";
-  display: block;
-  height: 1px;
-  background: var(--brown-light);
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background-color: #a0522d;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
@@ -177,84 +127,96 @@ body {
   transform: scaleX(1);
 }
 
-/* Section divider */
+/* =========================================
+   SECTION LINE
+   ========================================= */
 .section-line {
   width: 60px;
   height: 2px;
-  background: linear-gradient(to right, var(--brown), var(--brown-light));
-  border-radius: 2px;
+  background: linear-gradient(90deg, #a0522d, #c17b3f);
 }
 
-/* Card hover lift */
-.card-lift {
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.4s ease;
+/* =========================================
+   MOBILE MENU
+   ========================================= */
+.mobile-menu {
+  transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-.card-lift:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 24px 64px rgba(160, 82, 45, 0.15);
+/* =========================================
+   NO SCROLLBAR
+   ========================================= */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Image zoom on hover */
-.img-zoom {
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================
+   SMOOTH SCROLLING
+   ========================================= */
+html {
+  scroll-behavior: smooth;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
   overflow: hidden;
 }
 
-.img-zoom img {
-  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
-.img-zoom:hover img {
-  transform: scale(1.06);
+/* =========================================
+   BASE STYLES
+   ========================================= */
+body {
+  background-color: #faf7f2;
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Status badge */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(160, 82, 45, 0.1);
-  border: 1px solid rgba(160, 82, 45, 0.3);
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--brown-light);
+/* =========================================
+   SELECTION
+   ========================================= */
+::selection {
+  background: rgba(160, 82, 45, 0.2);
+  color: #1a1a1a;
 }
 
-/* Milestone card */
-.milestone-card {
-  border-left: 3px solid var(--brown-light);
-  padding-left: 24px;
-  position: relative;
+/* =========================================
+   SCROLLBAR STYLING
+   ========================================= */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-.milestone-card::before {
-  content: "";
-  position: absolute;
-  left: -7px;
-  top: 0;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--brown-light);
-  box-shadow: 0 0 0 4px rgba(193, 123, 63, 0.2);
+::-webkit-scrollbar-track {
+  background: #ede8e0;
 }
 
-/* Smooth image loading */
-img {
-  transition: opacity 0.3s ease;
+::-webkit-scrollbar-thumb {
+  background: #a0522d;
+  border-radius: 3px;
 }
 
-/* Mobile menu */
-.mobile-menu {
-  transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.mobile-menu.open {
-  transform: translateX(0);
+::-webkit-scrollbar-thumb:hover {
+  background: #c17b3f;
 }
