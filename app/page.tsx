@@ -2,23 +2,12 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 
-// Fonts
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-});
+// Remove the problematic import and fix the syntax
+// The original had: import { useState; useEffect, useEffect, useState, useCallback } from "react";
+// It should be: import { useEffect, useRef, useState, useCallback } from "react";
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-dm-sans",
-});
-
-// Types for GSAP & Lenis
+// Types for GSAP & Lenis (imported dynamically)
 type GSAPType = typeof import("gsap");
 type ScrollTriggerType = typeof import("gsap/ScrollTrigger");
 type LenisType = typeof import("lenis");
@@ -65,12 +54,19 @@ const Navbar = () => {
         {/* Logo */}
         <button onClick={() => scrollTo("hero")} className="flex items-center gap-3">
           <div className="relative w-10 h-10">
-            <Image src="/images/logo.png" alt="Lustro Homes" fill className="object-contain" />
+            <Image 
+              src="/images/logo.png" 
+              alt="Lustro Homes" 
+              fill 
+              className="object-contain"
+              sizes="40px"
+            />
           </div>
           <span
             className={`text-xl font-semibold tracking-tight transition-colors duration-300 ${
               isScrolled ? "text-[#1A1A1A]" : "text-white"
-            } font-[var(--font-cormorant)]`}
+            }`}
+            style={{ fontFamily: "var(--font-cormorant)" }}
           >
             Lustro Homes
           </span>
@@ -87,12 +83,11 @@ const Navbar = () => {
               }`}
             >
               {item.label}
-              <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#A0522D] scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100" />
             </button>
           ))}
           <button
             onClick={() =>
-              window.open("https://wa.me/[NUMBER]", "_blank")
+              window.open("https://wa.me/2348000000000", "_blank")
             }
             className="bg-[#A0522D] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#C17B3F] transition-all duration-300 shadow-lg shadow-[#A0522D]/20 hover:shadow-[#A0522D]/40 hover:-translate-y-0.5"
           >
@@ -103,22 +98,22 @@ const Navbar = () => {
         {/* Hamburger */}
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="lg:hidden flex flex-col gap-1.5 p-2"
+          className="lg:hidden flex flex-col gap-1.5 p-2 z-50"
           aria-label="Menu"
         >
           <span
             className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled ? "bg-[#1A1A1A]" : "bg-white"
+              isScrolled || isMobileOpen ? "bg-[#1A1A1A]" : "bg-white"
             } ${isMobileOpen ? "rotate-45 translate-y-2" : ""}`}
           />
           <span
             className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled ? "bg-[#1A1A1A]" : "bg-white"
+              isScrolled || isMobileOpen ? "bg-[#1A1A1A]" : "bg-white"
             } ${isMobileOpen ? "opacity-0" : ""}`}
           />
           <span
             className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled ? "bg-[#1A1A1A]" : "bg-white"
+              isScrolled || isMobileOpen ? "bg-[#1A1A1A]" : "bg-white"
             } ${isMobileOpen ? "-rotate-45 -translate-y-2" : ""}`}
           />
         </button>
@@ -126,7 +121,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`mobile-menu fixed inset-0 bg-[#1A1A1A]/98 backdrop-blur-lg z-40 flex flex-col items-center justify-center gap-8 transition-transform duration-500 ease-in-out lg:hidden ${
+        className={`fixed inset-0 bg-[#1A1A1A]/98 backdrop-blur-lg z-40 flex flex-col items-center justify-center gap-8 transition-transform duration-500 ease-in-out lg:hidden ${
           isMobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -141,7 +136,7 @@ const Navbar = () => {
         ))}
         <button
           onClick={() => {
-            window.open("https://wa.me/[NUMBER]", "_blank");
+            window.open("https://wa.me/2348000000000", "_blank");
             setIsMobileOpen(false);
           }}
           className="mt-4 bg-[#A0522D] text-white px-10 py-3 rounded-full text-lg font-semibold hover:bg-[#C17B3F] transition"
@@ -168,14 +163,17 @@ const HeroSection = () => {
   return (
     <section id="hero" className="relative h-screen w-full overflow-hidden">
       {/* Slideshow Container */}
-      <div className="absolute inset-0 translate-z-0 will-change-transform">
+      <div className="absolute inset-0" style={{ transform: "translateZ(0)", willChange: "transform" }}>
         {images.map((img, index) => (
           <div
             key={img}
-            className={`hero-slide absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${
-              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-[1.08]"
+            className={`hero-slide absolute inset-0 transition-all duration-[1500ms] ease-in-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
-            style={{ pointerEvents: "none" }}
+            style={{ 
+              pointerEvents: "none",
+              transform: index === currentSlide ? "scale(1)" : "scale(1.08)",
+            }}
           >
             <Image
               src={`/images/${img}`}
@@ -199,7 +197,7 @@ const HeroSection = () => {
           <p className="text-[#C9A96E] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
             Premium Staycation · Lagos
           </p>
-          <h1 className={`text-4xl md:text-6xl lg:text-7xl text-white font-light leading-tight mb-6 ${cormorant.className}`}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl text-white font-light leading-tight mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
             Your Lagos <br />
             <span className="italic text-[#C9A96E] font-medium">Staycation</span> Awaits.
           </h1>
@@ -208,7 +206,7 @@ const HeroSection = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => window.open("https://wa.me/[NUMBER]", "_blank")}
+              onClick={() => window.open("https://wa.me/2348000000000", "_blank")}
               className="bg-[#A0522D] text-white px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-[#C17B3F] transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
             >
               Book Your Stay
@@ -262,7 +260,7 @@ const StatsBar = () => {
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {stats.map((stat) => (
           <div key={stat.label}>
-            <p className="text-[#C9A96E] text-3xl md:text-4xl font-semibold mb-1 font-[var(--font-cormorant)]">
+            <p className="text-[#C9A96E] text-3xl md:text-4xl font-semibold mb-1" style={{ fontFamily: "var(--font-cormorant)" }}>
               {stat.number}
             </p>
             <p className="text-white/50 text-xs uppercase tracking-[0.2em]">{stat.label}</p>
@@ -282,7 +280,7 @@ const AboutSection = () => {
           <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
             Our Story
           </p>
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl text-[#1A1A1A] font-light leading-tight mb-6 ${cormorant.className}`}>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl text-[#1A1A1A] font-light leading-tight mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
             Lagos Luxury, <br />
             <span className="italic text-[#A0522D]">Redefined.</span>
           </h2>
@@ -297,15 +295,15 @@ const AboutSection = () => {
           </div>
           <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-[#EDE8E0]">
             <div>
-              <p className="text-[#A0522D] text-2xl font-semibold font-[var(--font-cormorant)]">3</p>
+              <p className="text-[#A0522D] text-2xl font-semibold" style={{ fontFamily: "var(--font-cormorant)" }}>3</p>
               <p className="text-xs uppercase tracking-wider text-[#2D2D2D]/60">Properties</p>
             </div>
             <div>
-              <p className="text-[#A0522D] text-2xl font-semibold font-[var(--font-cormorant)]">8,000+</p>
+              <p className="text-[#A0522D] text-2xl font-semibold" style={{ fontFamily: "var(--font-cormorant)" }}>8,000+</p>
               <p className="text-xs uppercase tracking-wider text-[#2D2D2D]/60">Stays</p>
             </div>
             <div>
-              <p className="text-[#A0522D] text-2xl font-semibold font-[var(--font-cormorant)]">3yrs</p>
+              <p className="text-[#A0522D] text-2xl font-semibold" style={{ fontFamily: "var(--font-cormorant)" }}>3yrs</p>
               <p className="text-xs uppercase tracking-wider text-[#2D2D2D]/60">Legacy</p>
             </div>
           </div>
@@ -362,7 +360,7 @@ const RoomsSection = () => {
           <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
             Stay With Us
           </p>
-          <h2 className={`text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4 ${cormorant.className}`}>
+          <h2 className="text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
             Rooms & Suites
           </h2>
           <div className="section-line w-16 h-0.5 bg-[#A0522D] mx-auto" />
@@ -385,7 +383,7 @@ const RoomsSection = () => {
               </div>
               <div className="p-6">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className={`text-2xl text-[#1A1A1A] font-medium ${cormorant.className}`}>
+                  <h3 className="text-2xl text-[#1A1A1A] font-medium" style={{ fontFamily: "var(--font-cormorant)" }}>
                     {room.name}
                   </h3>
                   <p className="text-[#A0522D] font-semibold">
@@ -400,7 +398,7 @@ const RoomsSection = () => {
                   ))}
                 </div>
                 <button
-                  onClick={() => window.open(`https://wa.me/[NUMBER]?text=I'm interested in ${room.name}`, "_blank")}
+                  onClick={() => window.open(`https://wa.me/2348000000000?text=I'm interested in ${room.name}`, "_blank")}
                   className="w-full bg-[#1A1A1A] text-white py-3 rounded-full text-sm font-semibold hover:bg-[#A0522D] transition-all duration-300"
                 >
                   Book This Room
@@ -417,21 +415,15 @@ const RoomsSection = () => {
 // Dining Section
 const DiningSection = () => {
   const images = ["dining-1.jpg", "dining-2.jpg", "dining-3.jpg", "dining-4.jpg"];
-  const gridSpans = [
-    "md:row-span-2 md:h-full",
-    "md:h-64",
-    "md:h-64",
-    "md:row-span-2 md:h-full",
-  ];
 
   return (
     <section id="dining" className="bg-[#1A1A1A] py-24 md:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
-        <div>
+        <div className="dining-left">
           <p className="text-[#C9A96E] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
             Signature Dining
           </p>
-          <h2 className={`text-4xl md:text-5xl text-white font-light leading-tight mb-6 ${cormorant.className}`}>
+          <h2 className="text-4xl md:text-5xl text-white font-light leading-tight mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
             Lustro Lagos <br />
             <span className="italic text-[#C9A96E]">Restaurant</span>
           </h2>
@@ -446,7 +438,7 @@ const DiningSection = () => {
           </div>
           <div className="flex flex-wrap gap-4 mt-8">
             <button
-              onClick={() => window.open("https://wa.me/[NUMBER]", "_blank")}
+              onClick={() => window.open("https://wa.me/2348000000000", "_blank")}
               className="bg-[#C9A96E] text-[#1A1A1A] px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-[#A0522D] hover:text-white transition-all duration-300"
             >
               Reserve A Table
@@ -463,11 +455,13 @@ const DiningSection = () => {
         </div>
 
         {/* Asymmetric Grid */}
-        <div className="grid grid-cols-2 gap-3 md:h-[500px]">
+        <div className="dining-right grid grid-cols-2 gap-3 md:h-[500px]">
           {images.map((img, i) => (
             <div
               key={img}
-              className={`relative overflow-hidden rounded-xl img-zoom ${gridSpans[i]} h-48`}
+              className={`relative overflow-hidden rounded-xl img-zoom ${
+                i === 0 || i === 3 ? "md:row-span-2" : ""
+              } h-48 ${i === 0 || i === 3 ? "md:h-full" : "md:h-[calc(50%-6px)]"}`}
             >
               <Image
                 src={`/images/${img}`}
@@ -496,7 +490,7 @@ const GallerySection = () => {
           <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
             Our Spaces
           </p>
-          <h2 className={`text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4 ${cormorant.className}`}>
+          <h2 className="text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
             Gallery
           </h2>
           <div className="section-line w-16 h-0.5 bg-[#A0522D] mx-auto" />
@@ -531,7 +525,9 @@ const GallerySection = () => {
             className="inline-flex items-center gap-2 text-[#A0522D] hover:text-[#C17B3F] font-medium transition-colors"
           >
             <span>Follow @lustro_homes on Instagram</span>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 100-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 11-2.882 0 1.441 1.441 0 012.882 0z"/></svg>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 100-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 11-2.882 0 1.441 1.441 0 012.882 0z"/>
+            </svg>
           </a>
         </div>
       </div>
@@ -575,7 +571,7 @@ const InvestmentSection = () => {
     <section id="invest" className="bg-[#2D2D2D] py-24 md:py-32">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
-          <h2 className={`text-3xl md:text-5xl text-white font-light mb-4 ${cormorant.className}`}>
+          <h2 className="text-3xl md:text-5xl text-white font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
             The Lustro Journey — From Vision to Value
           </h2>
           <p className="text-white/50 text-lg">3 Iconic Projects. 100% Delivery. A New Era.</p>
@@ -593,7 +589,7 @@ const InvestmentSection = () => {
 
                 <div className="bg-[#1A1A1A]/50 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/5">
                   <div className="flex flex-wrap items-center gap-4 mb-4">
-                    <h3 className={`text-2xl md:text-3xl text-white font-medium ${cormorant.className}`}>
+                    <h3 className="text-2xl md:text-3xl text-white font-medium" style={{ fontFamily: "var(--font-cormorant)" }}>
                       {m.title}
                     </h3>
                     <span className="status-badge inline-flex items-center gap-2 bg-[#A0522D]/20 text-[#C9A96E] text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-[#A0522D]/30">
@@ -623,7 +619,7 @@ const InvestmentSection = () => {
 
         {/* Bottom CTA */}
         <div className="mt-20 glass p-8 md:p-12 rounded-2xl text-center max-w-3xl mx-auto">
-          <h3 className={`text-3xl md:text-4xl text-white font-light mb-4 ${cormorant.className}`}>
+          <h3 className="text-3xl md:text-4xl text-white font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
             Lustro 4.0 Is Coming.
           </h3>
           <p className="text-white/60 mb-8 max-w-xl mx-auto leading-relaxed">
@@ -673,7 +669,7 @@ const TestimonialsSection = () => {
           <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
             Testimonials
           </p>
-          <h2 className={`text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4 ${cormorant.className}`}>
+          <h2 className="text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
             Loved by Guests
           </h2>
           <div className="section-line w-16 h-0.5 bg-[#A0522D] mx-auto" />
@@ -718,7 +714,7 @@ const ContactSection = () => {
       <div className="absolute inset-0 bg-[#1A1A1A]/80 z-10" />
 
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className={`text-4xl md:text-5xl text-white font-light mb-6 ${cormorant.className}`}>
+        <h2 className="text-4xl md:text-5xl text-white font-light mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
           Ready to Experience{" "}
           <span className="italic text-[#C9A96E]">Lustro?</span>
         </h2>
@@ -728,7 +724,7 @@ const ContactSection = () => {
 
         <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
           <a
-            href="https://wa.me/[NUMBER]"
+            href="https://wa.me/2348000000000"
             target="_blank"
             rel="noopener noreferrer"
             className="glass p-6 rounded-xl hover:bg-white/10 transition-all duration-300 group"
@@ -755,7 +751,7 @@ const ContactSection = () => {
         </div>
 
         <button
-          onClick={() => window.open("https://wa.me/[NUMBER]", "_blank")}
+          onClick={() => window.open("https://wa.me/2348000000000", "_blank")}
           className="bg-[#C9A96E] text-[#1A1A1A] px-12 py-4 rounded-full text-lg font-semibold hover:bg-white transition-all duration-300 shadow-2xl"
         >
           Book Your Stay Now
@@ -777,9 +773,9 @@ const FooterSection = () => {
         <div>
           <div className="flex items-center gap-3 mb-4">
             <div className="relative w-10 h-10">
-              <Image src="/images/logo.png" alt="Lustro Homes" fill className="object-contain" />
+              <Image src="/images/logo.png" alt="Lustro Homes" fill className="object-contain" sizes="40px" />
             </div>
-            <span className={`text-xl font-semibold text-white ${cormorant.className}`}>
+            <span className="text-xl font-semibold text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
               Lustro Homes
             </span>
           </div>
@@ -824,7 +820,7 @@ const FooterSection = () => {
               Restaurant · @lustro_lagos
             </a>
             <a
-              href="https://wa.me/[NUMBER]"
+              href="https://wa.me/2348000000000"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-white/40 hover:text-white transition-colors text-sm"
@@ -849,9 +845,9 @@ const FooterSection = () => {
 
 // Main Page Component
 export default function HomePage() {
-  const lenisRef = useRef<LenisType | null>(null);
-  const gsapRef = useRef<GSAPType | null>(null);
-  const scrollTriggerRef = useRef<ScrollTriggerType | null>(null);
+  const lenisRef = useRef<any>(null);
+  const gsapRef = useRef<any>(null);
+  const scrollTriggerRef = useRef<any>(null);
   const sectionsRef = useRef<HTMLElement[]>([]);
 
   // Initialize GSAP, ScrollTrigger, and Lenis
@@ -862,16 +858,18 @@ export default function HomePage() {
       try {
         const gsapModule = await import("gsap");
         const scrollTriggerModule = await import("gsap/ScrollTrigger");
-        const lenisModule = await import("lenis");
+        const Lenis = (await import("lenis")).default;
 
         if (!isMounted) return;
 
-        gsapRef.current = gsapModule.default;
-        scrollTriggerRef.current = scrollTriggerModule.default;
-        gsapRef.current.registerPlugin(scrollTriggerRef.current);
+        const gsap = gsapModule.default;
+        const ScrollTrigger = scrollTriggerModule.default;
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsapRef.current = gsap;
+        scrollTriggerRef.current = ScrollTrigger;
 
         // Initialize Lenis
-        const Lenis = lenisModule.default;
         const lenis = new Lenis({
           duration: 1.2,
           easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -881,79 +879,73 @@ export default function HomePage() {
         lenisRef.current = lenis;
 
         // Wire to GSAP ticker
-        gsapRef.current.ticker.add((time: number) => {
+        gsap.ticker.add((time: number) => {
           lenis.raf(time * 1000);
         });
-        gsapRef.current.ticker.lagSmoothing(0);
+        gsap.ticker.lagSmoothing(0);
 
         // Setup ScrollTrigger animations
-        if (scrollTriggerRef.current && gsapRef.current) {
-          const gsap = gsapRef.current;
-          const ScrollTrigger = scrollTriggerRef.current;
+        const sections = sectionsRef.current;
+        sections.forEach((section) => {
+          const elements = section.querySelectorAll("[data-reveal]");
+          if (elements.length > 0) {
+            gsap.fromTo(
+              elements,
+              { opacity: 0, y: 50 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.9,
+                stagger: 0.15,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: section,
+                  start: "top 80%",
+                  once: true,
+                },
+              }
+            );
+          }
+        });
 
-          // Animate sections on scroll
-          const sections = sectionsRef.current;
-          sections.forEach((section) => {
-            const elements = section.querySelectorAll("[data-reveal]");
-            if (elements.length > 0) {
-              gsap.fromTo(
-                elements,
-                { opacity: 0, y: 50 },
-                {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.9,
-                  stagger: 0.15,
-                  ease: "power3.out",
-                  scrollTrigger: {
-                    trigger: section,
-                    start: "top 80%",
-                    once: true,
-                  },
-                }
-              );
-            }
-          });
-
-          // Dining split-screen animation
-          const diningSection = document.getElementById("dining");
-          if (diningSection && gsap && ScrollTrigger) {
-            const left = diningSection.querySelector(".dining-left");
-            const right = diningSection.querySelector(".dining-right");
-            if (left) {
-              gsap.fromTo(
-                left,
-                { x: -60, opacity: 0 },
-                {
-                  x: 0,
-                  opacity: 1,
-                  duration: 1,
-                  ease: "power3.out",
-                  scrollTrigger: {
-                    trigger: diningSection,
-                    start: "top 70%",
-                    once: true,
-                  },
-                }
-              );
-            }
-            if (right) {
-              gsap.fromTo(
-                right,
-                { x: 60, opacity: 0 },
-                {
-                  x: 0,
-                  opacity: 1,
-                  duration: 1,
-                  ease: "power3.out",
-                  scrollTrigger: {
-                    trigger: diningSection,
-                    start: "top 70%",
-                    once: true,
-                  },
-                }
-              );
-            }
+        // Dining split-screen animation
+        const diningSection = document.getElementById("dining");
+        if (diningSection) {
+          const left = diningSection.querySelector(".dining-left");
+          const right = diningSection.querySelector(".dining-right");
+          if (left) {
+            gsap.fromTo(
+              left,
+              { x: -60, opacity: 0 },
+              {
+                x: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: diningSection,
+                  start: "top 70%",
+                  once: true,
+                },
+              }
+            );
+          }
+          if (right) {
+            gsap.fromTo(
+              right,
+              { x: 60, opacity: 0 },
+              {
+                x: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: diningSection,
+                  start: "top 70%",
+                  once: true,
+                },
+              }
+            );
           }
         }
       } catch (error) {
@@ -966,8 +958,9 @@ export default function HomePage() {
 
     return () => {
       isMounted = false;
-      lenisRef.current?.destroy();
-      gsapRef.current?.ticker.remove(() => {});
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+      }
     };
   }, []);
 
@@ -977,7 +970,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className={`${dmSans.variable} ${cormorant.variable} font-[var(--font-dm-sans)] text-[#1A1A1A]`}>
+    <div className="font-[var(--font-dm-sans)] text-[#1A1A1A]">
       <Navbar />
       <main>
         <HeroSection />
