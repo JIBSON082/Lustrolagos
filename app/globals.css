@@ -2,220 +2,152 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =========================================
-   GLASSMORPHIC CARDS
-   ========================================= */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Glassmorphism System */
 .glass {
-  background: rgba(26, 26, 26, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(26, 26, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   isolation: isolate;
   will-change: backdrop-filter;
 }
-
-@supports not ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
+@supports (backdrop-filter: blur(12px)) {
   .glass {
-    background: rgba(26, 26, 26, 0.85);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 }
 
 .glass-light {
-  background: rgba(250, 247, 242, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(26, 26, 26, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   isolation: isolate;
   will-change: backdrop-filter;
 }
-
-@supports not ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
+@supports (backdrop-filter: blur(12px)) {
   .glass-light {
-    background: rgba(250, 247, 242, 0.95);
+    background: rgba(250, 247, 242, 0.7);
+    backdrop-filter: blur(12px);
   }
 }
 
-/* =========================================
-   HERO SLIDESHOW
-   ========================================= */
+/* Hero Slideshow */
 .hero-slide {
+  opacity: 0;
+  transform: scale(1.08) translateZ(0);
+  transition: opacity 1.5s ease, transform 5s ease-out;
   will-change: transform, opacity;
-  transition: opacity 1500ms ease-in-out, transform 7000ms ease-out;
+  pointer-events: none;
+}
+.hero-slide.active {
+  opacity: 1;
+  transform: scale(1) translateZ(0);
 }
 
 .hero-scrim {
-  pointer-events: none;
+  background: linear-gradient(to top, rgba(26, 26, 26, 0.9) 0%, rgba(26, 26, 26, 0.2) 50%, rgba(26, 26, 26, 0.6) 100%);
 }
 
-/* =========================================
-   PULSE DOT ANIMATION
-   ========================================= */
-.pulse-dot {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.3);
-  }
-}
-
-/* =========================================
-   STATUS BADGE
-   ========================================= */
-.status-badge {
-  white-space: nowrap;
-}
-
-/* =========================================
-   MILESTONE CARD
-   ========================================= */
-.milestone-card {
-  position: relative;
-}
-
-/* =========================================
-   CARD LIFT HOVER
-   ========================================= */
-.card-lift {
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.4s ease;
-}
-
-.card-lift:hover {
-  transform: translateY(-8px);
-}
-
-/* =========================================
-   IMAGE ZOOM CONTAINER
-   ========================================= */
-.img-zoom {
-  overflow: hidden;
-}
-
-.img-zoom img {
-  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* =========================================
-   NAV LINK UNDERLINE
-   ========================================= */
-.nav-link {
-  position: relative;
-}
-
-.nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 1.5px;
-  background-color: #a0522d;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.nav-link:hover::after {
-  transform: scaleX(1);
-}
-
-/* =========================================
-   SECTION LINE
-   ========================================= */
+/* Custom UI Elements */
 .section-line {
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, #a0522d, #c17b3f);
+  background: linear-gradient(90deg, #A0522D, #C17B3F);
+  margin-top: 1rem;
+  margin-bottom: 2rem;
 }
 
-/* =========================================
-   MOBILE MENU
-   ========================================= */
-.mobile-menu {
-  transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: -4px;
+  left: 0;
+  background-color: currentColor;
+  transform-origin: bottom right;
+  transition: transform 0.3s cubic-bezier(0.86, 0, 0.07, 1);
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
 }
 
-/* =========================================
-   NO SCROLLBAR
-   ========================================= */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* =========================================
-   SMOOTH SCROLLING
-   ========================================= */
-html {
-  scroll-behavior: smooth;
-}
-
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
+.img-zoom {
   overflow: hidden;
 }
-
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
+.img-zoom img {
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.img-zoom:hover img {
+  transform: scale(1.08) translateZ(0);
 }
 
-/* =========================================
-   BASE STYLES
-   ========================================= */
-body {
-  background-color: #faf7f2;
-  color: #1a1a1a;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.card-lift {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.card-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
 }
 
-/* =========================================
-   SELECTION
-   ========================================= */
-::selection {
-  background: rgba(160, 82, 45, 0.2);
-  color: #1a1a1a;
+/* Timeline System */
+.milestone-card {
+  position: relative;
+  border-left: 3px solid #C17B3F;
+  padding-left: 24px;
+}
+.milestone-card::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 8px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #C17B3F;
+  box-shadow: 0 0 0 4px rgba(193, 123, 63, 0.2);
 }
 
-/* =========================================
-   SCROLLBAR STYLING
-   ========================================= */
-::-webkit-scrollbar {
-  width: 6px;
+/* Animations */
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  animation: pulse-dot 2s infinite;
+  display: inline-block;
+  margin-left: 8px;
 }
 
-::-webkit-scrollbar-track {
-  background: #ede8e0;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #a0522d;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #c17b3f;
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
