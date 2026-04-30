@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -8,21 +7,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#A0522D",
-        "primary-light": "#C17B3F",
-        cream: "#FAF7F2",
-        "cream-dark": "#EDE8E0",
-        charcoal: "#1A1A1A",
-        "charcoal-light": "#2D2D2D",
+        brown: {
+          DEFAULT: "#A0522D",
+          light: "#C17B3F",
+        },
+        cream: {
+          DEFAULT: "#FAF7F2",
+          dark: "#EDE8E0",
+        },
+        charcoal: {
+          DEFAULT: "#1A1A1A",
+          light: "#2D2D2D",
+        },
         gold: "#C9A96E",
       },
       fontFamily: {
-        display: ["var(--font-cormorant)", "Georgia", "serif"],
-        body: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)"],
+        body: ["var(--font-dm-sans)"],
       },
     },
   },
   plugins: [],
 };
-
 export default config;
