@@ -1,408 +1,263 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
-// Remove the problematic import and fix the syntax
-// The original had: import { useState; useEffect, useEffect, useState, useCallback } from "react";
-// It should be: import { useEffect, useRef, useState, useCallback } from "react";
+// ----------------------------------------------------------------------
+// DATA CONSTANTS
+// ----------------------------------------------------------------------
+const WHATSAPP_NUMBER = "2340000000000"; // Replace with actual
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
-// Types for GSAP & Lenis (imported dynamically)
-type GSAPType = typeof import("gsap");
-type ScrollTriggerType = typeof import("gsap/ScrollTrigger");
-type LenisType = typeof import("lenis");
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1542314831-c6a4d14d8379?q=80&w=2000&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=2000&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2000&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=2000&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2000&auto=format&fit=crop"
+];
 
-// Navbar Component
-const Navbar = () => {
+// ----------------------------------------------------------------------
+// COMPONENTS
+// ----------------------------------------------------------------------
+
+function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-    setIsMobileOpen(false);
-  };
-
-  const menuItems = [
-    { label: "About", id: "about" },
-    { label: "Rooms", id: "rooms" },
-    { label: "Dining", id: "dining" },
-    { label: "Gallery", id: "gallery" },
-    { label: "Invest", id: "invest" },
-    { label: "Contact", id: "contact" },
+  const navLinks = [
+    { name: "About", href: "#about" },
+    { name: "Rooms", href: "#rooms" },
+    { name: "Dining", href: "#dining" },
+    { name: "Gallery", href: "#gallery" },
+    { name: "Invest", href: "#invest" },
+    { name: "Contact", href: "#contact" },
   ];
 
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-[#FAF7F2]/95 backdrop-blur-md shadow-sm py-3"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        {/* Logo */}
-        <button onClick={() => scrollTo("hero")} className="flex items-center gap-3">
-          <div className="relative w-10 h-10">
-            <Image 
-              src="/images/logo.png" 
-              alt="Lustro Homes" 
-              fill 
-              className="object-contain"
-              sizes="40px"
-            />
-          </div>
-          <span
-            className={`text-xl font-semibold tracking-tight transition-colors duration-300 ${
-              isScrolled ? "text-[#1A1A1A]" : "text-white"
-            }`}
-            style={{ fontFamily: "var(--font-cormorant)" }}
-          >
-            Lustro Homes
-          </span>
-        </button>
-
-        {/* Desktop Links */}
-        <div className="hidden lg:flex items-center gap-8">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => scrollTo(item.id)}
-              className={`nav-link text-sm uppercase tracking-wider font-medium transition-colors duration-300 relative py-1 ${
-                isScrolled ? "text-[#2D2D2D]" : "text-white/90"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-          <button
-            onClick={() =>
-              window.open("https://wa.me/2348000000000", "_blank")
-            }
-            className="bg-[#A0522D] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#C17B3F] transition-all duration-300 shadow-lg shadow-[#A0522D]/20 hover:shadow-[#A0522D]/40 hover:-translate-y-0.5"
-          >
-            Book Now
-          </button>
-        </div>
-
-        {/* Hamburger */}
-        <button
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="lg:hidden flex flex-col gap-1.5 p-2 z-50"
-          aria-label="Menu"
-        >
-          <span
-            className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled || isMobileOpen ? "bg-[#1A1A1A]" : "bg-white"
-            } ${isMobileOpen ? "rotate-45 translate-y-2" : ""}`}
-          />
-          <span
-            className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled || isMobileOpen ? "bg-[#1A1A1A]" : "bg-white"
-            } ${isMobileOpen ? "opacity-0" : ""}`}
-          />
-          <span
-            className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled || isMobileOpen ? "bg-[#1A1A1A]" : "bg-white"
-            } ${isMobileOpen ? "-rotate-45 -translate-y-2" : ""}`}
-          />
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`fixed inset-0 bg-[#1A1A1A]/98 backdrop-blur-lg z-40 flex flex-col items-center justify-center gap-8 transition-transform duration-500 ease-in-out lg:hidden ${
-          isMobileOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => scrollTo(item.id)}
-            className="text-white text-2xl uppercase tracking-widest font-light hover:text-[#C9A96E] transition-colors"
-          >
-            {item.label}
-          </button>
-        ))}
-        <button
-          onClick={() => {
-            window.open("https://wa.me/2348000000000", "_blank");
-            setIsMobileOpen(false);
-          }}
-          className="mt-4 bg-[#A0522D] text-white px-10 py-3 rounded-full text-lg font-semibold hover:bg-[#C17B3F] transition"
-        >
-          Book Now
-        </button>
-      </div>
-    </nav>
-  );
-};
-
-// Hero Section
-const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const images = ["hero-1.jpg", "hero-2.jpg", "hero-3.jpg", "hero-4.jpg", "hero-5.jpg"];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % images.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [images.length]);
-
-  return (
-    <section id="hero" className="relative h-screen w-full overflow-hidden">
-      {/* Slideshow Container */}
-      <div className="absolute inset-0" style={{ transform: "translateZ(0)", willChange: "transform" }}>
-        {images.map((img, index) => (
-          <div
-            key={img}
-            className={`hero-slide absolute inset-0 transition-all duration-[1500ms] ease-in-out ${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            }`}
-            style={{ 
-              pointerEvents: "none",
-              transform: index === currentSlide ? "scale(1)" : "scale(1.08)",
-            }}
-          >
-            <Image
-              src={`/images/${img}`}
-              alt={`Lustro Homes ${index + 1}`}
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className="object-cover"
-              style={{ transform: "translateZ(0)" }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Scrim Overlay */}
-      <div className="hero-scrim absolute inset-0 z-10 bg-gradient-to-b from-[#1A1A1A]/60 via-[#1A1A1A]/40 to-[#1A1A1A]/80" />
-
-      {/* Glass Card Content */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center">
-        <div className="glass mx-4 p-8 md:p-12 lg:p-16 rounded-2xl max-w-2xl w-full text-center">
-          <p className="text-[#C9A96E] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
-            Premium Staycation · Lagos
-          </p>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl text-white font-light leading-tight mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Your Lagos <br />
-            <span className="italic text-[#C9A96E] font-medium">Staycation</span> Awaits.
-          </h1>
-          <p className="text-white/70 text-base md:text-lg mb-8 max-w-lg mx-auto leading-relaxed">
-            Where Yaba meets world-class luxury — experience signature shortlets, in-house dining, and a stay that feels like home, only better.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => window.open("https://wa.me/2348000000000", "_blank")}
-              className="bg-[#A0522D] text-white px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-[#C17B3F] transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
-            >
-              Book Your Stay
-            </button>
-            <button
-              onClick={() => document.getElementById("rooms")?.scrollIntoView({ behavior: "smooth" })}
-              className="border border-white/30 text-white px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-white/10 transition-all duration-300"
-            >
-              Explore Rooms
-            </button>
+    <>
+      <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? "bg-cream/90 backdrop-blur-md shadow-sm py-4" : "bg-transparent py-6"}`}>
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-3 cursor-pointer">
+            <span className={`font-display text-2xl font-bold tracking-wider ${isScrolled ? "text-charcoal" : "text-white"}`}>LUSTRO</span>
           </div>
 
-          {/* Dot Indicators */}
-          <div className="flex justify-center gap-2 mt-8">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`transition-all duration-500 rounded-full ${
-                  index === currentSlide
-                    ? "w-8 h-2.5 bg-[#A0522D]"
-                    : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"
-                }`}
-                aria-label={`Slide ${index + 1}`}
-              />
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a key={link.name} href={link.href} className={`text-sm tracking-wide nav-link ${isScrolled ? "text-charcoal" : "text-white"}`}>
+                {link.name}
+              </a>
             ))}
           </div>
+
+          <div className="hidden md:block">
+            <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="bg-brown hover:bg-brown-light text-white px-6 py-2.5 rounded-full text-sm font-medium transition-colors">
+              Book Now
+            </a>
+          </div>
+
+          <button onClick={() => setMobileMenuOpen(true)} className={`md:hidden ${isScrolled ? "text-charcoal" : "text-white"}`}>
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      <div className={`fixed inset-0 bg-charcoal z-[60] flex flex-col justify-center items-center transition-transform duration-500 ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+        <button onClick={() => setMobileMenuOpen(false)} className="absolute top-6 right-6 text-white">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <div className="flex flex-col gap-6 text-center">
+          {navLinks.map((link) => (
+            <a key={link.name} href={link.href} onClick={() => setMobileMenuOpen(false)} className="font-display text-4xl text-white hover:text-gold transition-colors">
+              {link.name}
+            </a>
+          ))}
+          <a href={WHATSAPP_LINK} className="mt-8 bg-brown text-white px-8 py-3 rounded-full">Book Your Stay</a>
         </div>
       </div>
-
-      {/* Scroll Cue */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white/50">
-        <span className="block w-[1px] h-10 bg-gradient-to-b from-white/40 to-transparent" />
-        <span className="text-xs uppercase tracking-[0.3em]">Scroll</span>
-      </div>
-    </section>
+    </>
   );
-};
+}
 
-// Stats Bar
-const StatsBar = () => {
-  const stats = [
-    { number: "15,000+", label: "Guests Hosted" },
-    { number: "3", label: "Iconic Properties" },
-    { number: "₦2M+", label: "Monthly Revenue" },
-    { number: "100%", label: "Delivery Rate" },
-  ];
+function Hero() {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="bg-[#1A1A1A] py-10 md:py-14">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-        {stats.map((stat) => (
-          <div key={stat.label}>
-            <p className="text-[#C9A96E] text-3xl md:text-4xl font-semibold mb-1" style={{ fontFamily: "var(--font-cormorant)" }}>
-              {stat.number}
-            </p>
-            <p className="text-white/50 text-xs uppercase tracking-[0.2em]">{stat.label}</p>
+    <section className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-charcoal">
+      {/* Layer 1: Backgrounds */}
+      <div className="absolute inset-0 z-1" style={{ transform: 'translateZ(0)' }}>
+        {HERO_IMAGES.map((src, index) => (
+          <div key={index} className={`absolute inset-0 hero-slide ${index === activeSlide ? "active" : ""}`}>
+            <Image src={src} alt="Lustro Homes Luxury" fill sizes="100vw" className="object-cover" priority={index === 0} quality={90} />
           </div>
         ))}
       </div>
-    </section>
-  );
-};
 
-// About Section
-const AboutSection = () => {
-  return (
-    <section id="about" className="bg-[#FAF7F2] py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-16 items-center">
-        <div>
-          <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
-            Our Story
+      {/* Layer 2: Scrim */}
+      <div className="absolute inset-0 z-10 hero-scrim" />
+
+      {/* Layer 3: Glassmorphic Content */}
+      <div className="relative z-20 max-w-4xl w-full px-6 text-center text-white mt-16">
+        <div className="glass p-8 md:p-12 rounded-3xl inline-block mx-auto gsap-reveal">
+          <span className="uppercase tracking-[0.2em] text-xs font-bold text-white/80 mb-4 block">Premium Staycation · Lagos</span>
+          <h1 className="font-display text-5xl md:text-7xl leading-tight mb-6">
+            Your Lagos <span className="italic text-gold">Staycation</span> Awaits.
+          </h1>
+          <p className="text-lg text-white/90 font-light max-w-2xl mx-auto mb-8">
+            Experience unparalleled luxury, signature dining, and the ultimate city escape in the heart of Yaba.
           </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl text-[#1A1A1A] font-light leading-tight mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Lagos Luxury, <br />
-            <span className="italic text-[#A0522D]">Redefined.</span>
-          </h2>
-          <div className="section-line w-16 h-0.5 bg-[#A0522D] mb-8" />
-          <div className="space-y-5 text-[#2D2D2D]/80 leading-relaxed">
-            <p>
-              Lustro Homes was born from a simple yet bold vision — to bring uncompromising luxury to the heart of Yaba. What started as a single property on Ibukun Olu Street has evolved into a movement redefining what staycations mean on the Lagos Mainland.
-            </p>
-            <p>
-              Every Lustro property is a curated experience — blending modern aesthetics, signature in-house dining, and the warmth of Nigerian hospitality. We don&apos;t just offer rooms; we craft moments that linger long after check-out.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-[#EDE8E0]">
-            <div>
-              <p className="text-[#A0522D] text-2xl font-semibold" style={{ fontFamily: "var(--font-cormorant)" }}>3</p>
-              <p className="text-xs uppercase tracking-wider text-[#2D2D2D]/60">Properties</p>
-            </div>
-            <div>
-              <p className="text-[#A0522D] text-2xl font-semibold" style={{ fontFamily: "var(--font-cormorant)" }}>8,000+</p>
-              <p className="text-xs uppercase tracking-wider text-[#2D2D2D]/60">Stays</p>
-            </div>
-            <div>
-              <p className="text-[#A0522D] text-2xl font-semibold" style={{ fontFamily: "var(--font-cormorant)" }}>3yrs</p>
-              <p className="text-xs uppercase tracking-wider text-[#2D2D2D]/60">Legacy</p>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href={WHATSAPP_LINK} className="bg-brown hover:bg-brown-light text-white px-8 py-4 rounded-full transition-colors font-medium">Book Your Stay</a>
+            <a href="#rooms" className="bg-transparent border border-white/30 hover:bg-white/10 text-white px-8 py-4 rounded-full transition-colors font-medium">Explore Rooms</a>
           </div>
         </div>
-        <div className="relative group">
-          <div className="relative overflow-hidden rounded-2xl aspect-[4/5] img-zoom">
-            <Image
-              src="/images/about.jpg"
-              alt="Lustro Homes Interior"
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+
+        {/* Indicators */}
+        <div className="flex justify-center gap-2 mt-12">
+          {HERO_IMAGES.map((_, i) => (
+            <button key={i} onClick={() => setActiveSlide(i)} className={`h-1.5 rounded-full transition-all duration-500 ${i === activeSlide ? "w-8 bg-brown" : "w-2 bg-white/40"}`} aria-label={`Go to slide ${i + 1}`} />
+          ))}
+        </div>
+      </div>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-70">
+        <span className="text-xs tracking-widest text-white uppercase">Scroll</span>
+        <div className="w-[1px] h-12 bg-white/30 overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-full bg-white animate-[slide-down_2s_ease-in-out_infinite]" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Stats() {
+  const stats = [
+    { value: "15,000+", label: "GUESTS HOSTED" },
+    { value: "3", label: "ICONIC PROPERTIES" },
+    { value: "₦2M+", label: "MONTHLY REVENUE" },
+    { value: "100%", label: "DELIVERY RATE" },
+  ];
+
+  return (
+    <section className="bg-charcoal text-white py-12 border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10 text-center">
+          {stats.map((stat, i) => (
+            <div key={i} className="gsap-reveal border-l-0 first:border-0 md:first:border-0 border-white/10">
+              <div className="font-display text-4xl md:text-5xl text-gold mb-2">{stat.value}</div>
+              <div className="text-[10px] md:text-xs tracking-widest uppercase text-white/50">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function About() {
+  return (
+    <section id="about" className="bg-cream py-24 md:py-32 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+        <div className="gsap-reveal-left order-2 md:order-1">
+          <span className="uppercase tracking-widest text-xs font-bold text-brown mb-2 block">Our Story</span>
+          <h2 className="font-display text-4xl md:text-6xl text-charcoal leading-tight">Lagos Luxury, <span className="italic text-brown-light">Redefined.</span></h2>
+          <div className="section-line"></div>
+          <div className="space-y-6 text-charcoal-light/80 mb-8 font-light leading-relaxed">
+            <p>Lustro Homes began with a singular vision: to create the most sought-after staycation experience on the Lagos Mainland. We fuse world-class interior design with localized hospitality, ensuring every guest feels an immediate sense of belonging and prestige.</p>
+            <p>We don't just host; we curate lifestyles. From our signature dining experiences to our meticulously engineered smart homes, we are setting a new benchmark for luxury and investment in Nigeria.</p>
           </div>
-          <div className="absolute -bottom-4 -right-4 glass-light px-5 py-3 rounded-xl shadow-lg">
-            <p className="text-sm font-medium text-[#1A1A1A]">@lustro_homes</p>
+          <div className="flex gap-6 pt-6 border-t border-charcoal/10">
+            <div><span className="block font-display text-2xl text-brown">3</span><span className="text-xs uppercase tracking-wider text-charcoal/50">Properties</span></div>
+            <div><span className="block font-display text-2xl text-brown">8k+</span><span className="text-xs uppercase tracking-wider text-charcoal/50">Stays</span></div>
+            <div><span className="block font-display text-2xl text-brown">3yrs</span><span className="text-xs uppercase tracking-wider text-charcoal/50">Excellence</span></div>
+          </div>
+        </div>
+        <div className="gsap-reveal-right order-1 md:order-2 relative">
+          <div className="img-zoom rounded-2xl relative h-[500px] w-full shadow-2xl">
+            <Image src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1000&auto=format&fit=crop" alt="Lustro Homes Interior" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          </div>
+          <div className="absolute -bottom-6 -left-6 glass-light p-4 rounded-xl shadow-xl z-10 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-brown flex items-center justify-center text-white">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </div>
+            <div>
+              <p className="text-sm font-bold leading-tight">@lustro_homes</p>
+              <p className="text-xs text-charcoal/60">Follow our journey</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
-};
+}
 
-// Rooms Section
-const RoomsSection = () => {
+function Rooms() {
   const rooms = [
     {
-      name: "The Studio",
-      type: "Classic Room",
-      price: "₦50,000",
+      title: "The Studio", subtitle: "Classic Room", price: "₦50,000",
       features: ["King Bed", "Smart TV", "Fast WiFi", "AC", "En-suite"],
-      image: "room-1.jpg",
+      img: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1000&auto=format&fit=crop"
     },
     {
-      name: "The Signature",
-      type: "Premium Suite",
-      price: "₦85,000",
+      title: "The Signature", subtitle: "Premium Suite", price: "₦85,000",
       features: ["King Bed", "Glass Shower", "Netflix Ready", "Rattan Wardrobe", "Lounge Area"],
-      image: "room-2.jpg",
+      img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1000&auto=format&fit=crop"
     },
     {
-      name: "The Penthouse",
-      type: "Top Floor Suite",
-      price: "₦120,000",
+      title: "The Penthouse", subtitle: "Top Floor Suite", price: "₦120,000",
       features: ["King Bed", "Panoramic View", "Private Terrace", "Smart Automation", "Butler Ready"],
-      image: "room-3.jpg",
-    },
+      img: "https://images.unsplash.com/photo-1505693314120-0d443867891c?q=80&w=1000&auto=format&fit=crop"
+    }
   ];
 
   return (
-    <section id="rooms" className="bg-[#EDE8E0] py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
-            Stay With Us
-          </p>
-          <h2 className="text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Rooms & Suites
-          </h2>
-          <div className="section-line w-16 h-0.5 bg-[#A0522D] mx-auto" />
+    <section id="rooms" className="bg-cream-dark py-24 md:py-32">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col items-center text-center mb-16 gsap-reveal">
+          <span className="uppercase tracking-widest text-xs font-bold text-brown mb-2">Our Spaces</span>
+          <h2 className="font-display text-4xl md:text-5xl text-charcoal">Rooms & Suites</h2>
+          <div className="section-line mx-auto"></div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {rooms.map((room) => (
-            <div key={room.name} className="card-lift group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500">
-              <div className="relative h-64 overflow-hidden img-zoom">
-                <Image
-                  src={`/images/${room.image}`}
-                  alt={room.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <span className="absolute top-4 left-4 bg-[#A0522D]/90 text-white text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-sm">
-                  {room.type}
-                </span>
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-2xl text-[#1A1A1A] font-medium" style={{ fontFamily: "var(--font-cormorant)" }}>
-                    {room.name}
-                  </h3>
-                  <p className="text-[#A0522D] font-semibold">
-                    {room.price}<span className="text-xs font-normal text-[#2D2D2D]/50">/night</span>
-                  </p>
+        <div className="grid md:grid-cols-3 gap-8">
+          {rooms.map((room, i) => (
+            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm card-lift gsap-reveal">
+              <div className="relative h-64 img-zoom">
+                <Image src={room.img} alt={room.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                  {room.subtitle}
                 </div>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {room.features.map((f) => (
-                    <span key={f} className="text-xs bg-[#FAF7F2] text-[#2D2D2D]/70 px-2.5 py-1 rounded-full">
-                      {f}
-                    </span>
+              </div>
+              <div className="p-8">
+                <div className="flex justify-between items-end mb-4">
+                  <h3 className="font-display text-3xl">{room.title}</h3>
+                  <div className="text-right">
+                    <span className="block text-sm text-charcoal/50">per night</span>
+                    <span className="font-bold text-brown">{room.price}</span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {room.features.map((feat, j) => (
+                    <span key={j} className="bg-cream-dark text-charcoal text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-md">{feat}</span>
                   ))}
                 </div>
-                <button
-                  onClick={() => window.open(`https://wa.me/2348000000000?text=I'm interested in ${room.name}`, "_blank")}
-                  className="w-full bg-[#1A1A1A] text-white py-3 rounded-full text-sm font-semibold hover:bg-[#A0522D] transition-all duration-300"
-                >
+                <a href={WHATSAPP_LINK} className="block w-full text-center border border-brown text-brown hover:bg-brown hover:text-white py-3 rounded-full transition-colors text-sm font-bold">
                   Book This Room
-                </button>
+                </a>
               </div>
             </div>
           ))}
@@ -410,287 +265,170 @@ const RoomsSection = () => {
       </div>
     </section>
   );
-};
+}
 
-// Dining Section
-const DiningSection = () => {
-  const images = ["dining-1.jpg", "dining-2.jpg", "dining-3.jpg", "dining-4.jpg"];
+function Dining() {
+  const images = [
+    { src: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=800&auto=format&fit=crop", classes: "col-span-1 row-span-2 h-full" },
+    { src: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800&auto=format&fit=crop", classes: "col-span-1 row-span-1 h-48" },
+    { src: "https://images.unsplash.com/photo-1414235077428-33898ed1e829?q=80&w=800&auto=format&fit=crop", classes: "col-span-1 row-span-1 h-48" },
+    { src: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=800&auto=format&fit=crop", classes: "col-span-1 row-span-2 h-full -mt-12" },
+  ];
 
   return (
-    <section id="dining" className="bg-[#1A1A1A] py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
-        <div className="dining-left">
-          <p className="text-[#C9A96E] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
-            Signature Dining
-          </p>
-          <h2 className="text-4xl md:text-5xl text-white font-light leading-tight mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Lustro Lagos <br />
-            <span className="italic text-[#C9A96E]">Restaurant</span>
-          </h2>
-          <div className="section-line w-16 h-0.5 bg-[#C9A96E] mb-8" />
-          <div className="space-y-5 text-white/60 leading-relaxed">
-            <p>
-              Lustro Lagos is our in-house culinary experience — where bold African flavors meet international finesse. Every dish is crafted with intention, plated with artistry, and served in an ambiance that whispers luxury.
-            </p>
-            <p>
-              Whether it&apos;s a candlelit dinner for two, a celebratory brunch with friends, or a quiet solo meal — our restaurant transforms dining into a destination.
-            </p>
+    <section id="dining" className="bg-charcoal text-white py-24 md:py-32 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+        <div className="gsap-reveal-left">
+          <span className="uppercase tracking-widest text-xs font-bold text-gold mb-2 block">Signature Dining</span>
+          <h2 className="font-display text-4xl md:text-6xl leading-tight mb-2">Lustro Lagos <br/><span className="italic text-gold">Restaurant.</span></h2>
+          <div className="section-line bg-gradient-to-r from-gold to-yellow-600"></div>
+          <div className="space-y-6 text-white/70 font-light mb-10">
+            <p>Gastronomy elevated. Lustro Lagos is not just an amenity—it's a destination. Our in-house chefs craft continental and local masterpieces designed to tantalize your palate.</p>
+            <p>From perfectly brewed morning coffees to twilight cocktails, our dining space offers the perfect ambiance for romance, business, or unwinding after a long day in the city.</p>
           </div>
-          <div className="flex flex-wrap gap-4 mt-8">
-            <button
-              onClick={() => window.open("https://wa.me/2348000000000", "_blank")}
-              className="bg-[#C9A96E] text-[#1A1A1A] px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-[#A0522D] hover:text-white transition-all duration-300"
-            >
-              Reserve A Table
-            </button>
-            <a
-              href="https://instagram.com/lustro_lagos"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-white/20 text-white px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-white/10 transition-all duration-300 inline-flex items-center gap-2"
-            >
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a href={WHATSAPP_LINK} className="bg-gold hover:bg-yellow-600 text-charcoal px-8 py-3.5 rounded-full font-bold transition-colors text-center">Reserve A Table</a>
+            <a href="https://instagram.com/lustro_lagos" target="_blank" rel="noreferrer" className="border border-white/20 hover:bg-white/10 px-8 py-3.5 rounded-full transition-colors flex items-center justify-center gap-2">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               @lustro_lagos
             </a>
           </div>
         </div>
-
-        {/* Asymmetric Grid */}
-        <div className="dining-right grid grid-cols-2 gap-3 md:h-[500px]">
+        <div className="gsap-reveal-right grid grid-cols-2 gap-4">
           {images.map((img, i) => (
-            <div
-              key={img}
-              className={`relative overflow-hidden rounded-xl img-zoom ${
-                i === 0 || i === 3 ? "md:row-span-2" : ""
-              } h-48 ${i === 0 || i === 3 ? "md:h-full" : "md:h-[calc(50%-6px)]"}`}
-            >
-              <Image
-                src={`/images/${img}`}
-                alt={`Dining ${i + 1}`}
-                fill
-                sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover transition-transform duration-700 hover:scale-110"
-              />
+            <div key={i} className={`img-zoom rounded-xl relative ${img.classes}`}>
+              <Image src={img.src} alt="Dining Experience" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
             </div>
           ))}
         </div>
       </div>
     </section>
   );
-};
+}
 
-// Gallery Section
-const GallerySection = () => {
-  const images = Array.from({ length: 8 }, (_, i) => `gallery-${i + 1}.jpg`);
-  const bigIndices = [0, 4]; // images 1 and 5 span 2 cols
+function Gallery() {
+  const images = [
+    "https://images.unsplash.com/photo-1560185016-df153df1869e?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1572555513568-1eb86a2f77c8?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1414235077428-33898ed1e829?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1587985150436-1e626e2e8e97?q=80&w=800&auto=format&fit=crop",
+  ];
 
   return (
-    <section id="gallery" className="bg-[#FAF7F2] py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
-            Our Spaces
-          </p>
-          <h2 className="text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Gallery
-          </h2>
-          <div className="section-line w-16 h-0.5 bg-[#A0522D] mx-auto" />
+    <section id="gallery" className="bg-cream py-24 md:py-32">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col items-center text-center mb-16 gsap-reveal">
+          <span className="uppercase tracking-widest text-xs font-bold text-brown mb-2">Aesthetic Appeal</span>
+          <h2 className="font-display text-4xl md:text-5xl text-charcoal">Gallery</h2>
+          <div className="section-line mx-auto"></div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-auto">
-          {images.map((img, i) => (
-            <div
-              key={img}
-              className={`relative overflow-hidden rounded-xl img-zoom ${
-                bigIndices.includes(i)
-                  ? "md:col-span-2 h-72"
-                  : "h-52"
-              }`}
-            >
-              <Image
-                src={`/images/${img}`}
-                alt={`Gallery ${i + 1}`}
-                fill
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover transition-transform duration-700 hover:scale-110"
-              />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {images.map((src, i) => (
+            <div key={i} className={`img-zoom rounded-xl relative gsap-reveal ${i === 0 || i === 4 ? "md:col-span-2 h-72" : "h-52"}`}>
+              <Image src={src} alt="Lustro Gallery" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
             </div>
           ))}
         </div>
-
-        <div className="text-center mt-10">
-          <a
-            href="https://instagram.com/lustro_homes"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-[#A0522D] hover:text-[#C17B3F] font-medium transition-colors"
-          >
-            <span>Follow @lustro_homes on Instagram</span>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 100-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 11-2.882 0 1.441 1.441 0 012.882 0z"/>
-            </svg>
+        <div className="mt-12 text-center gsap-reveal">
+          <a href="https://instagram.com/lustro_homes" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-charcoal hover:text-brown transition-colors font-medium border-b border-charcoal/20 pb-1 hover:border-brown">
+            More on Instagram <span>→</span>
           </a>
         </div>
       </div>
     </section>
   );
-};
+}
 
-// Investment Section
-const InvestmentSection = () => {
+function Investment() {
   const milestones = [
     {
-      title: "Lustro 1.0 — The Blueprint",
-      subtitle: "Where Yaba First Met Luxury",
-      story:
-        "Started with a simple goal — create the most sought-after shortlet in Yaba. Built an experience with signature in-house dining and world-class aesthetics.",
+      title: "LUSTRO 1.0 — THE BLUEPRINT", subtitle: "Where Yaba First Met Luxury",
+      story: "Started with a simple goal — create the most sought-after shortlet in Yaba. Built an experience with signature in-house dining and world-class aesthetics.",
       stats: ["15,000+ Guests Hosted", "₦2M+ Monthly Revenue", "₦1.4M/mo Investor Profit"],
-      badge: "SOLD OUT & ACTIVE",
-      quote: "The proof is in the staying.",
+      status: "SOLD OUT & ACTIVE", color: "text-red-500"
     },
     {
-      title: "Lustro 2.0 — The Yankee Edition",
-      subtitle: "Luxury Redefined on the Mainland",
-      story:
-        "Brought resort-quality living to Lagos Mainland. Yankee by Lustro — launched, sold out, delivering. No delays. No excuses. Just results.",
+      title: "LUSTRO 2.0 — THE YANKEE EDITION", subtitle: "Luxury Redefined on the Mainland",
+      story: "Brought resort-quality living to Lagos Mainland. Yankee by Lustro — launched, sold out, delivering. No delays. No excuses. Just results.",
       stats: ["Sold Out Launch Status", "Monthly Returns", "100% Satisfaction"],
-      badge: "SOLD OUT & DELIVERING",
-      quote: "Our standard is now everyone else's benchmark.",
+      status: "SOLD OUT & DELIVERING", color: "text-red-500"
     },
     {
-      title: "Lustro 3.0 — The Smart Ecosystem",
-      subtitle: "The Ultimate Lifestyle Sanctuary",
-      story:
-        "Most ambitious project yet. Fully automated smart apartments. Yaba's first in-house spa. Professional gym. Built, delivered, earning.",
+      title: "LUSTRO 3.0 — THE SMART ECOSYSTEM", subtitle: "The Ultimate Lifestyle Sanctuary",
+      story: "Most ambitious project yet. Fully automated smart apartments. Yaba's first in-house spa. Professional gym. Built, delivered, earning.",
       stats: ["Full Auto Smart Features", "Yaba's First In-House Spa", "₦1.4M/mo Investor ROI"],
-      badge: "COMPLETED & EARNING",
-      quote: "We don't build houses. We engineer the future.",
-    },
+      status: "COMPLETED & EARNING", color: "text-red-500"
+    }
   ];
 
   return (
-    <section id="invest" className="bg-[#2D2D2D] py-24 md:py-32">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-5xl text-white font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
-            The Lustro Journey — From Vision to Value
-          </h2>
-          <p className="text-white/50 text-lg">3 Iconic Projects. 100% Delivery. A New Era.</p>
+    <section id="invest" className="bg-charcoal-light py-24 md:py-32 text-white">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="mb-20 gsap-reveal">
+          <h2 className="font-display text-4xl md:text-5xl text-gold mb-4">The Lustro Journey — From Vision to Value</h2>
+          <p className="text-xl text-white/70 font-light">3 Iconic Projects. 100% Delivery. A New Era.</p>
         </div>
 
-        <div className="relative pl-8 md:pl-0">
-          {/* Vertical Line */}
-          <div className="absolute left-4 md:left-8 top-0 bottom-0 w-[3px] bg-[#C17B3F]/30 hidden md:block" />
-
-          <div className="space-y-16">
-            {milestones.map((m, i) => (
-              <div key={m.title} className="milestone-card relative pl-8 md:pl-16 border-l-[3px] border-[#C17B3F] md:border-l-0">
-                {/* Dot */}
-                <div className="absolute left-[-7px] md:left-[29px] top-1.5 w-[11px] h-[11px] rounded-full bg-[#C17B3F] shadow-[0_0_0_4px_rgba(193,123,63,0.2)] z-10" />
-
-                <div className="bg-[#1A1A1A]/50 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/5">
-                  <div className="flex flex-wrap items-center gap-4 mb-4">
-                    <h3 className="text-2xl md:text-3xl text-white font-medium" style={{ fontFamily: "var(--font-cormorant)" }}>
-                      {m.title}
-                    </h3>
-                    <span className="status-badge inline-flex items-center gap-2 bg-[#A0522D]/20 text-[#C9A96E] text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-[#A0522D]/30">
-                      <span className="pulse-dot w-2 h-2 bg-red-500 rounded-full" />
-                      {m.badge}
-                    </span>
-                  </div>
-                  <p className="text-[#C9A96E] text-lg mb-3 font-medium">{m.subtitle}</p>
-                  <p className="text-white/60 leading-relaxed mb-6">{m.story}</p>
-
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    {m.stats.map((s) => (
-                      <div key={s} className="text-center p-3 bg-white/5 rounded-lg">
-                        <p className="text-white text-sm font-medium">{s}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <blockquote className="border-l-2 border-[#C17B3F] pl-4 italic text-white/40 text-sm">
-                    &ldquo;{m.quote}&rdquo;
-                  </blockquote>
-                </div>
+        <div className="ml-2 md:ml-6 border-l-2 border-white/10 pl-6 md:pl-10 relative">
+          {milestones.map((ms, i) => (
+            <div key={i} className="milestone-card mb-16 gsap-reveal">
+              <div className="status-badge mb-4">
+                {ms.status} <span className={`pulse-dot bg-red-500`}></span>
               </div>
-            ))}
-          </div>
+              <h3 className="font-display text-2xl md:text-3xl mb-1">{ms.title}</h3>
+              <h4 className="text-gold italic mb-4">{ms.subtitle}</h4>
+              <p className="text-white/60 font-light leading-relaxed mb-6 max-w-2xl">{ms.story}</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {ms.stats.map((stat, j) => (
+                  <div key={j} className="bg-white/5 rounded-lg p-3 text-sm border border-white/5">{stat}</div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-20 glass p-8 md:p-12 rounded-2xl text-center max-w-3xl mx-auto">
-          <h3 className="text-3xl md:text-4xl text-white font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Lustro 4.0 Is Coming.
-          </h3>
-          <p className="text-white/60 mb-8 max-w-xl mx-auto leading-relaxed">
-            People who moved first on 1.0, 2.0, 3.0 are earning every month. Don&apos;t miss out on the next chapter.
+        <div className="glass mt-16 p-8 md:p-12 text-center rounded-2xl gsap-reveal">
+          <h3 className="font-display text-4xl text-gold mb-4">Lustro 4.0 Is Coming.</h3>
+          <p className="text-white/80 max-w-xl mx-auto mb-8 leading-relaxed font-light">
+            People who moved first on 1.0, 2.0, and 3.0 are earning every month. The next evolution of luxury and smart investment is on the horizon. Don't miss out.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#A0522D] text-white px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-[#C17B3F] transition-all duration-300 shadow-lg">
-              Get Early Access
-            </button>
-            <button className="border border-white/20 text-white px-8 py-3.5 rounded-full text-sm font-semibold hover:bg-white/10 transition-all duration-300">
-              Stay Connected
-            </button>
+            <a href={WHATSAPP_LINK} className="bg-gold hover:bg-yellow-600 text-charcoal px-8 py-3.5 rounded-full font-bold transition-colors">Get Early Access</a>
+            <a href="https://instagram.com/lustro_homes" target="_blank" rel="noreferrer" className="border border-white/20 hover:bg-white/10 px-8 py-3.5 rounded-full transition-colors font-medium">Stay Connected</a>
           </div>
         </div>
       </div>
     </section>
   );
-};
+}
 
-// Testimonials Section
-const TestimonialsSection = () => {
+function Testimonials() {
   const reviews = [
-    {
-      name: "Adaeze O.",
-      location: "Lekki, Lagos",
-      stars: 5,
-      text: "From the moment we arrived, everything was perfect. The room aesthetics, the service, the food at Lustro Lagos — I have never experienced anything like it in Nigeria.",
-    },
-    {
-      name: "Tunde M.",
-      location: "Ikeja, Lagos",
-      stars: 5,
-      text: "Yankee by Lustro is a different world entirely. My girls and I booked for a staycation and did not want to leave. Every corner is Instagram-worthy.",
-    },
-    {
-      name: "Chisom E.",
-      location: "Abuja",
-      stars: 5,
-      text: "I was visiting Lagos for a conference and chose Lustro on a recommendation. Best decision I made. The room felt like an international hotel.",
-    },
+    { name: "Adaeze O.", loc: "Lekki Lagos", text: "From the moment we arrived, everything was perfect. The room aesthetics, the service, the food at Lustro Lagos — I have never experienced anything like it in Nigeria." },
+    { name: "Tunde M.", loc: "Ikeja Lagos", text: "Yankee by Lustro is a different world entirely. My girls and I booked for a staycation and did not want to leave. Every corner is Instagram-worthy." },
+    { name: "Chisom E.", loc: "Abuja", text: "I was visiting Lagos for a conference and chose Lustro on a recommendation. Best decision I made. The room felt like an international hotel." }
   ];
 
   return (
-    <section className="bg-[#EDE8E0] py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-[#A0522D] text-sm uppercase tracking-[0.3em] mb-3 font-medium">
-            Testimonials
-          </p>
-          <h2 className="text-4xl md:text-5xl text-[#1A1A1A] font-light mb-4" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Loved by Guests
-          </h2>
-          <div className="section-line w-16 h-0.5 bg-[#A0522D] mx-auto" />
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reviews.map((review) => (
-            <div key={review.name} className="card-lift bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500">
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: review.stars }).map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-[#C9A96E]" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
+    <section className="bg-cream-dark py-24 md:py-32">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-3 gap-8">
+          {reviews.map((rev, i) => (
+            <div key={i} className="bg-white p-8 rounded-2xl shadow-sm card-lift gsap-reveal">
+              <div className="flex text-gold mb-6">
+                {[1,2,3,4,5].map(s => (
+                  <svg key={s} width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                 ))}
               </div>
-              <blockquote className="italic text-[#2D2D2D]/70 mb-6 leading-relaxed">
-                &ldquo;{review.text}&rdquo;
-              </blockquote>
+              <p className="font-display italic text-xl text-charcoal/80 mb-6 leading-relaxed">"{rev.text}"</p>
               <div>
-                <p className="font-semibold text-[#1A1A1A]">{review.name}</p>
-                <p className="text-sm text-[#2D2D2D]/50">{review.location}</p>
+                <p className="font-bold text-charcoal">{rev.name}</p>
+                <p className="text-xs text-charcoal/50 uppercase tracking-widest">{rev.loc}</p>
               </div>
             </div>
           ))}
@@ -698,292 +436,164 @@ const TestimonialsSection = () => {
       </div>
     </section>
   );
-};
+}
 
-// Contact Section
-const ContactSection = () => {
+function Contact() {
   return (
-    <section id="contact" className="relative py-24 md:py-32">
-      <Image
-        src="/images/hero-1.jpg"
-        alt="Contact Background"
-        fill
-        className="object-cover"
-        sizes="100vw"
-      />
-      <div className="absolute inset-0 bg-[#1A1A1A]/80 z-10" />
-
-      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-4xl md:text-5xl text-white font-light mb-6" style={{ fontFamily: "var(--font-cormorant)" }}>
-          Ready to Experience{" "}
-          <span className="italic text-[#C9A96E]">Lustro?</span>
-        </h2>
-        <p className="text-white/50 mb-12 max-w-lg mx-auto">
-          Your luxury staycation is just a message away. Reach out and let us curate your perfect escape.
-        </p>
-
-        <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
-          <a
-            href="https://wa.me/2348000000000"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glass p-6 rounded-xl hover:bg-white/10 transition-all duration-300 group"
-          >
-            <p className="text-2xl mb-2">📱</p>
-            <p className="text-white font-medium mb-1">WhatsApp Us</p>
-            <p className="text-white/40 text-sm">Start a conversation</p>
-          </a>
-          <div className="glass p-6 rounded-xl">
-            <p className="text-2xl mb-2">📍</p>
-            <p className="text-white font-medium mb-1">Location</p>
-            <p className="text-white/40 text-sm">37 Ibukun Olu St, Akoka, Yaba</p>
+    <section id="contact" className="relative py-32 bg-charcoal flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 z-1" style={{ transform: 'translateZ(0)' }}>
+        <Image src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop" alt="Lustro Homes Contact" fill sizes="100vw" className="object-cover" />
+      </div>
+      <div className="absolute inset-0 z-10 bg-charcoal/80" />
+      
+      <div className="relative z-20 max-w-5xl mx-auto px-6 text-center text-white gsap-reveal">
+        <h2 className="font-display text-5xl md:text-6xl mb-12">Ready to Experience <span className="italic text-gold">Lustro?</span></h2>
+        
+        <div className="grid md:grid-cols-3 gap-6 mb-12 text-left">
+          <div className="glass p-6 rounded-2xl flex flex-col gap-2">
+            <span className="text-2xl mb-2">📱</span>
+            <span className="text-xs uppercase tracking-widest text-white/50">WhatsApp Us</span>
+            <a href={WHATSAPP_LINK} className="font-medium hover:text-gold transition-colors">Chat for Booking</a>
           </div>
-          <a
-            href="https://instagram.com/lustro_homes"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glass p-6 rounded-xl hover:bg-white/10 transition-all duration-300"
-          >
-            <p className="text-2xl mb-2">📸</p>
-            <p className="text-white font-medium mb-1">Instagram</p>
-            <p className="text-white/40 text-sm">@lustro_homes</p>
-          </a>
+          <div className="glass p-6 rounded-2xl flex flex-col gap-2">
+            <span className="text-2xl mb-2">📍</span>
+            <span className="text-xs uppercase tracking-widest text-white/50">Location</span>
+            <span className="font-medium">37 Ibukun Olu St, Akoka, Yaba</span>
+          </div>
+          <div className="glass p-6 rounded-2xl flex flex-col gap-2">
+            <span className="text-2xl mb-2">📸</span>
+            <span className="text-xs uppercase tracking-widest text-white/50">Instagram</span>
+            <a href="https://instagram.com/lustro_homes" target="_blank" rel="noreferrer" className="font-medium hover:text-gold transition-colors">@lustro_homes</a>
+          </div>
         </div>
 
-        <button
-          onClick={() => window.open("https://wa.me/2348000000000", "_blank")}
-          className="bg-[#C9A96E] text-[#1A1A1A] px-12 py-4 rounded-full text-lg font-semibold hover:bg-white transition-all duration-300 shadow-2xl"
-        >
+        <a href={WHATSAPP_LINK} className="inline-block bg-brown hover:bg-brown-light text-white px-10 py-5 rounded-full font-bold text-lg transition-colors shadow-xl">
           Book Your Stay Now
-        </button>
+        </a>
       </div>
     </section>
   );
-};
+}
 
-// Footer
-const FooterSection = () => {
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
+function Footer() {
   return (
-    <footer className="bg-[#1A1A1A] border-t border-white/5 pt-20 pb-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-12 mb-16">
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="relative w-10 h-10">
-              <Image src="/images/logo.png" alt="Lustro Homes" fill className="object-contain" sizes="40px" />
-            </div>
-            <span className="text-xl font-semibold text-white" style={{ fontFamily: "var(--font-cormorant)" }}>
-              Lustro Homes
-            </span>
+    <footer className="bg-charcoal text-white pt-20 pb-8 border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-3 gap-12 mb-16">
+          <div>
+            <div className="font-display text-3xl font-bold tracking-wider mb-4 text-white">LUSTRO</div>
+            <p className="text-gold italic mb-4 font-display text-xl">Staycation in Lagos | Signature Dining | Investment</p>
+            <p className="text-white/50 text-sm font-light leading-relaxed max-w-sm">
+              Redefining luxury hospitality and real estate investment on the Lagos Mainland. Built for those who demand excellence.
+            </p>
           </div>
-          <p className="text-[#C9A96E] text-sm mb-3 italic">Staycation in Lagos | Signature Dining | Investment</p>
-          <p className="text-white/40 text-sm leading-relaxed">
-            Where luxury meets Lagos Mainland. Curated shortlets, exceptional dining, and premium investment opportunities in the heart of Yaba.
-          </p>
-        </div>
-
-        <div>
-          <h4 className="text-white font-medium mb-4 uppercase tracking-wider text-sm">Navigate</h4>
-          <div className="space-y-3">
-            {["About", "Rooms", "Dining", "Gallery", "Invest", "Contact"].map((item) => (
-              <button
-                key={item}
-                onClick={() => scrollTo(item.toLowerCase())}
-                className="block text-white/40 hover:text-white transition-colors text-sm"
-              >
-                {item}
-              </button>
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs uppercase tracking-widest text-white/50 mb-4">Navigation</h4>
+            {["About", "Rooms", "Dining", "Gallery", "Invest", "Contact"].map(link => (
+              <a key={link} href={`#${link.toLowerCase()}`} className="text-white/80 hover:text-gold transition-colors w-fit">{link}</a>
             ))}
           </div>
-        </div>
-
-        <div>
-          <h4 className="text-white font-medium mb-4 uppercase tracking-wider text-sm">Connect</h4>
-          <div className="space-y-3">
-            <a
-              href="https://instagram.com/lustro_homes"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-white/40 hover:text-white transition-colors text-sm"
-            >
-              Instagram · @lustro_homes
-            </a>
-            <a
-              href="https://instagram.com/lustro_lagos"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-white/40 hover:text-white transition-colors text-sm"
-            >
-              Restaurant · @lustro_lagos
-            </a>
-            <a
-              href="https://wa.me/2348000000000"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-white/40 hover:text-white transition-colors text-sm"
-            >
-              WhatsApp Booking
-            </a>
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs uppercase tracking-widest text-white/50 mb-4">Social</h4>
+            <a href="https://instagram.com/lustro_homes" target="_blank" rel="noreferrer" className="text-white/80 hover:text-gold transition-colors w-fit">Instagram @lustro_homes</a>
+            <a href="https://instagram.com/lustro_lagos" target="_blank" rel="noreferrer" className="text-white/80 hover:text-gold transition-colors w-fit">Instagram @lustro_lagos</a>
+            <a href={WHATSAPP_LINK} className="text-white/80 hover:text-gold transition-colors w-fit">WhatsApp Booking</a>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-white/20 text-xs">
-          &copy; {new Date().getFullYear()} Lustro Homes. All rights reserved.
-        </p>
-        <p className="text-white/20 text-xs">
-          37 Ibukun Olu Street, Akoka, Yaba, Lagos, Nigeria.
-        </p>
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40">
+          <p>&copy; {new Date().getFullYear()} Lustro Homes. All rights reserved.</p>
+          <p>37 Ibukun Olu Street, Akoka, Yaba, Lagos, Nigeria.</p>
+        </div>
       </div>
     </footer>
   );
-};
+}
 
-// Main Page Component
-export default function HomePage() {
-  const lenisRef = useRef<any>(null);
-  const gsapRef = useRef<any>(null);
-  const scrollTriggerRef = useRef<any>(null);
-  const sectionsRef = useRef<HTMLElement[]>([]);
-
-  // Initialize GSAP, ScrollTrigger, and Lenis
+export default function Page() {
   useEffect(() => {
-    let isMounted = true;
+    let lenisInstance: any;
 
-    const initAnimations = async () => {
+    const initAnimationSystems = async () => {
       try {
-        const gsapModule = await import("gsap");
-        const scrollTriggerModule = await import("gsap/ScrollTrigger");
-        const Lenis = (await import("lenis")).default;
+        const { default: Lenis } = await import("lenis");
+        const gsapPkg = await import("gsap");
+        const ScrollTriggerPkg = await import("gsap/ScrollTrigger");
 
-        if (!isMounted) return;
+        const gsap = gsapPkg.default || gsapPkg;
+        const ScrollTrigger = ScrollTriggerPkg.default || ScrollTriggerPkg;
 
-        const gsap = gsapModule.default;
-        const ScrollTrigger = scrollTriggerModule.default;
         gsap.registerPlugin(ScrollTrigger);
 
-        gsapRef.current = gsap;
-        scrollTriggerRef.current = ScrollTrigger;
+        lenisInstance = new Lenis();
 
-        // Initialize Lenis
-        const lenis = new Lenis({
-          duration: 1.2,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          smoothWheel: true,
-        });
-
-        lenisRef.current = lenis;
-
-        // Wire to GSAP ticker
-        gsap.ticker.add((time: number) => {
-          lenis.raf(time * 1000);
+        gsap.ticker.add((time) => {
+          lenisInstance.raf(time * 1000);
         });
         gsap.ticker.lagSmoothing(0);
 
-        // Setup ScrollTrigger animations
-        const sections = sectionsRef.current;
-        sections.forEach((section) => {
-          const elements = section.querySelectorAll("[data-reveal]");
-          if (elements.length > 0) {
-            gsap.fromTo(
-              elements,
-              { opacity: 0, y: 50 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.9,
-                stagger: 0.15,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: section,
-                  start: "top 80%",
-                  once: true,
-                },
-              }
-            );
-          }
+        // Standard up-reveal
+        const reveals = document.querySelectorAll(".gsap-reveal");
+        reveals.forEach((el) => {
+          gsap.fromTo(el, 
+            { opacity: 0, y: 50 },
+            { 
+              scrollTrigger: { trigger: el, start: "top 85%", once: true },
+              opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.15 
+            }
+          );
         });
 
-        // Dining split-screen animation
-        const diningSection = document.getElementById("dining");
-        if (diningSection) {
-          const left = diningSection.querySelector(".dining-left");
-          const right = diningSection.querySelector(".dining-right");
-          if (left) {
-            gsap.fromTo(
-              left,
-              { x: -60, opacity: 0 },
-              {
-                x: 0,
-                opacity: 1,
-                duration: 1,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: diningSection,
-                  start: "top 70%",
-                  once: true,
-                },
-              }
-            );
-          }
-          if (right) {
-            gsap.fromTo(
-              right,
-              { x: 60, opacity: 0 },
-              {
-                x: 0,
-                opacity: 1,
-                duration: 1,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: diningSection,
-                  start: "top 70%",
-                  once: true,
-                },
-              }
-            );
-          }
-        }
+        // Left split reveal
+        const leftReveals = document.querySelectorAll(".gsap-reveal-left");
+        leftReveals.forEach((el) => {
+          gsap.fromTo(el, 
+            { opacity: 0, x: -60 },
+            { 
+              scrollTrigger: { trigger: el, start: "top 85%", once: true },
+              opacity: 1, x: 0, duration: 0.9, ease: "power3.out"
+            }
+          );
+        });
+
+        // Right split reveal
+        const rightReveals = document.querySelectorAll(".gsap-reveal-right");
+        rightReveals.forEach((el) => {
+          gsap.fromTo(el, 
+            { opacity: 0, x: 60 },
+            { 
+              scrollTrigger: { trigger: el, start: "top 85%", once: true },
+              opacity: 1, x: 0, duration: 0.9, ease: "power3.out"
+            }
+          );
+        });
+
       } catch (error) {
-        console.warn("Animation libraries failed to load:", error);
-        // Graceful fallback — site works without animations
+        console.error("Animation system failed to initialize gracefully:", error);
       }
     };
 
-    initAnimations();
+    initAnimationSystems();
 
     return () => {
-      isMounted = false;
-      if (lenisRef.current) {
-        lenisRef.current.destroy();
+      if (lenisInstance) {
+        lenisInstance.destroy();
       }
     };
-  }, []);
-
-  // Collect section refs
-  const setSectionRef = useCallback((el: HTMLElement | null, index: number) => {
-    if (el) sectionsRef.current[index] = el;
   }, []);
 
   return (
-    <div className="font-[var(--font-dm-sans)] text-[#1A1A1A]">
+    <main className="relative bg-cream min-h-screen">
       <Navbar />
-      <main>
-        <HeroSection />
-        <div ref={(el) => setSectionRef(el, 0)}><StatsBar /></div>
-        <div ref={(el) => setSectionRef(el, 1)} data-reveal><AboutSection /></div>
-        <div ref={(el) => setSectionRef(el, 2)} data-reveal><RoomsSection /></div>
-        <div ref={(el) => setSectionRef(el, 3)}><DiningSection /></div>
-        <div ref={(el) => setSectionRef(el, 4)} data-reveal><GallerySection /></div>
-        <div ref={(el) => setSectionRef(el, 5)} data-reveal><InvestmentSection /></div>
-        <div ref={(el) => setSectionRef(el, 6)} data-reveal><TestimonialsSection /></div>
-        <div ref={(el) => setSectionRef(el, 7)} data-reveal><ContactSection /></div>
-      </main>
-      <FooterSection />
-    </div>
+      <Hero />
+      <Stats />
+      <About />
+      <Rooms />
+      <Dining />
+      <Gallery />
+      <Investment />
+      <Testimonials />
+      <Contact />
+      <Footer />
+    </main>
   );
 }
